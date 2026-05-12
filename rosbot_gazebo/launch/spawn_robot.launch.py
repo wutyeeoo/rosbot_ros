@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Modifications Copyright (c) 2026 [Wut Yee Oo]
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogInfo
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -201,6 +203,7 @@ def generate_launch_description():
             "arm_activate": arm_activate,
             "configuration": configuration,
             "robot_model": robot_model,
+            "namespace": namespace,
             "use_sim": "True",
         }.items(),
     )
@@ -208,7 +211,7 @@ def generate_launch_description():
     husarion_components_description = FindPackageShare("husarion_components_description")
     rosbot_joy = FindPackageShare("rosbot_joy")
     rosbot_localization = FindPackageShare("rosbot_localization")
-    rosbot_utils = FindPackageShare("rosbot_utils")
+    # rosbot_utils = FindPackageShare("rosbot_utils")
 
     gz_components = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -218,6 +221,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "components_config_path": components_config,
+            "namespace": namespace
         }.items(),
     )
 
@@ -233,12 +237,13 @@ def generate_launch_description():
         ),
     )
 
-    laser_filter_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution([rosbot_utils, "launch", "laser_filter.launch.py"])
-        ),
-        launch_arguments={"robot_model": robot_model}.items(),
-    )
+    # laser_filter_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         PathJoinSubstitution([rosbot_utils, "launch", "laser_filter.launch.py"])
+    #     ),
+    #     launch_arguments={"robot_model": robot_model,
+    #                       "namespace": namespace}.items(),
+    # )
 
     return LaunchDescription(
         [
@@ -264,6 +269,6 @@ def generate_launch_description():
             controller_launch,
             joy_launch,
             localization_launch,
-            laser_filter_launch,
+            # laser_filter_launch,
         ]
     )

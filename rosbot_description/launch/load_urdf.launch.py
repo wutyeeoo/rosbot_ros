@@ -14,12 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Modifications Copyright (c) 2026 [Wut Yee Oo]
 import os
 
 import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription,OpaqueFunction
 from launch.conditions import IfCondition
 from launch.substitutions import (
     Command,
@@ -31,7 +32,7 @@ from launch.substitutions import (
 )
 from launch_ros.actions import Node, SetParameter, SetRemap
 from launch_ros.substitutions import FindPackageShare
-
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def contains_cam_component(yaml_fil):
     with open(yaml_fil, "r") as file:
@@ -40,6 +41,12 @@ def contains_cam_component(yaml_fil):
             return any(item["type"].startswith("CAM") for item in data["components"])
     return False
 
+def get_laser_config(yaml_fil):
+    with open(yaml_fil, "r") as file:
+        data = yaml.safe_load(file)
+        if "lasers" in data:
+            return data["lasers"]
+    return []
 
 def launch_setup(context, *args, **kwargs):
     config_dir = LaunchConfiguration("config_dir").perform(context)
@@ -76,28 +83,50 @@ def launch_setup(context, *args, **kwargs):
     include_camera_mount = PythonExpression(
         [camera_configuration, " and not ", manipulator_configuration]
     )
+
+    laser_config = get_laser_config(components_config)
+    x1 = laser_config[0]["x"] if laser_config else 0.0 
+    y1 = laser_config[0]["y"] if laser_config else 0.0
+    z1 = laser_config[0]["z"] if laser_config else 0.0
+    roll1 = laser_config[0]["roll"] if laser_config else 0.0
+    pitch1 = laser_config[0]["pitch"] if laser_config else 0.0
+    yaw1 = laser_config[0]["yaw"] if laser_config else 0.0
+    prefix1 = laser_config[0]["prefix"] if laser_config else "front"
+    xyz1 = f"{x1} {y1} {z1}"
+    rpy1 = f"{roll1} {pitch1} {yaw1}"
+    alpha1 = laser_config[0]["alpha"] if laser_config else 0.0
+
+    x2 = laser_config[1]["x"] if len(laser_config) > 1 else 0.0
+    y2 = laser_config[1]["y"] if len(laser_config) > 1 else 0.0
+    z2 = laser_config[1]["z"] if len(laser_config) > 1 else 0.0
+    roll2 = laser_config[1]["roll"] if len(laser_config) > 1 else 0.0 
+    pitch2 = laser_config[1]["pitch"] if len(laser_config) > 1 else 0.0
+    yaw2 = laser_config[1]["yaw"] if len(laser_config) > 1 else 0.0
+    prefix2 = laser_config[1]["prefix"] if len(laser_config) > 1 else "rear"    
+    xyz2 = f"{x2} {y2} {z2}"
+    rpy2 = f"{roll2} {pitch2} {yaw2}"
+    alpha2 = laser_config[1]["alpha"] if len(laser_config) > 1 else 180.0
+
     urdf_file = robot_model + ".urdf.xacro"
     robot_description_content = Command(
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution([FindPackageShare("rosbot_description"), "urdf", urdf_file]),
-            " components_config:=",
-            components_config,
-            " configuration:=",
-            configuration,
-            " controller_config:=",
-            controller_config,
-            " include_camera_mount:=",
-            include_camera_mount,
-            " manipulator_serial_port:=",
-            manipulator_serial_port,
-            " mecanum:=",
-            mecanum,
-            " namespace:=",
-            namespace,
-            " use_sim:=",
-            use_sim,
+            " components_config:=", components_config,
+            " configuration:=", configuration,
+            " controller_config:=", controller_config,
+            " include_camera_mount:=", include_camera_mount,
+            " manipulator_serial_port:=", manipulator_serial_port,
+            " mecanum:=", mecanum,
+            " namespace:=", namespace,
+            " use_sim:=", use_sim,
+            ' xyz1:="', xyz1, '"',
+            ' rpy1:="', rpy1, '"',
+            " prefix1:=", prefix1,
+            ' xyz2:="', xyz2, '"',
+            ' rpy2:="', rpy2, '"',
+            " prefix2:=", prefix2,
         ]
     )
     robot_description = {"robot_description": robot_description_content}
@@ -115,12 +144,37 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(mock_joints),
     )
 
+    laser_merge = FindPackageShare("ros2_laser_scan_merger")
+
+    laser_merge_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution([laser_merge, "launch", "merge_2_scan.launch.py"])
+        ),
+        condition=IfCondition("true" if laser_config else "false"),
+        launch_arguments={
+            "namespace": namespace,
+            "use_sim": use_sim,
+            "x1": str(x1),
+            "y1": str(y1),
+            "z1": str(z1),
+            "alpha1": str(alpha1),  # Assuming no rotation for simplicity, adjust as needed
+            "prefix1": prefix1,
+            "x2": str(x2),
+            "y2": str(y2),
+            "z2": str(z2),
+            "alpha2": str(alpha2),  # Assuming the second laser is rotated 180 degrees, adjust as needed
+            "prefix2": prefix2,
+
+        }.items(),
+    )
+
     return [
         SetParameter(name="use_sim_time", value=use_sim),
         SetRemap("/tf", "tf"),
         SetRemap("/tf_static", "tf_static"),
         robot_state_pub_node,
         joint_state_publisher_node,
+        laser_merge_launch
     ]
 
 

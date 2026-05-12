@@ -6,6 +6,12 @@
   <xacro:arg name="mecanum" default="false" />
   <xacro:arg name="namespace" default="" />
   <xacro:arg name="use_sim" default="false" />
+  <xacro:arg name="xyz1" default="0 0 0" />
+  <xacro:arg name="rpy1" default="0 0 0" />
+  <xacro:arg name="prefix1" default="front" />
+  <xacro:arg name="xyz2" default="0 0 0" />
+  <xacro:arg name="rpy2" default="0 0 3.141" />
+  <xacro:arg name="prefix2" default="rear" />
 
   <xacro:include filename="$(find rosbot_description)/urdf/rosbot/rosbot_macro.urdf.xacro" ns="husarion" />
   <xacro:include filename="$(find husarion_components_description)/urdf/components.urdf.xacro" ns="components" />
@@ -14,7 +20,14 @@
     controller_config="$(arg controller_config)"
     mecanum="$(arg mecanum)"
     namespace="$(arg namespace)"
-    use_sim="$(arg use_sim)" />
+    use_sim="$(arg use_sim)" 
+    xyz1="$(arg xyz1)"
+    rpy1="$(arg rpy1)"
+    prefix1="$(arg prefix1)"
+    xyz2="$(arg xyz2)"
+    rpy2="$(arg rpy2)"
+    prefix2="$(arg prefix2)" 
+  />
 
   <xacro:components.create_components
     components_config_path="$(arg components_config)"

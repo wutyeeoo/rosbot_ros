@@ -4,31 +4,38 @@
     params="controller_config
             mecanum
             namespace
-            use_sim">
+            use_sim
+            xyz1
+            rpy1
+            prefix1
+            xyz2
+            rpy2
+            prefix2">
 
     <!-- PROPERTIES -->
-    <xacro:property name="wheel_radius" value="${0.047 if mecanum else 0.0425}" />
+    <xacro:property name="wheel_radius" value="${0.047 if mecanum else 0.0344}" />
 
     <!-- INCLUDE ROBOT MACRO -->
     <xacro:include filename="$(find rosbot_description)/urdf/common/gazebo.urdf.xacro" ns="gazebo" />
     <xacro:include filename="$(find rosbot_description)/urdf/common/ros2_control.urdf.xacro" ns="ros2_control" />
     <!-- <xacro:include filename="$(find rosbot_description)/urdf/common/webots.urdf.xacro" ns="webots" /> -->
-    <xacro:include filename="$(find rosbot_description)/urdf/rosbot/body.urdf.xacro" ns="body" />
+    <xacro:include filename="$(find rosbot_description)/urdf/rosbot/body.urdf.xacro" ns="body" />`
     <xacro:include filename="$(find rosbot_description)/urdf/rosbot/wheel.urdf.xacro" ns="wheel" />
 
     <!-- BODY -->
-    <xacro:body.body wheel_radius="${wheel_radius}" namespace="${namespace}" />
+    <xacro:body.body wheel_radius="${wheel_radius}" namespace="${namespace}" xyz1="${xyz1}" rpy1="${rpy1}" prefix1="${prefix1}" xyz2="${xyz2}" rpy2="${rpy2}" prefix2="${prefix2}" />
 
     <!-- WHEEL -->
-    <xacro:wheel.wheel wheel_radius="${wheel_radius}" side="fl" mecanum="${mecanum}" />
-    <xacro:wheel.wheel wheel_radius="${wheel_radius}" side="fr" mecanum="${mecanum}" />
-    <xacro:wheel.wheel wheel_radius="${wheel_radius}" side="rl" mecanum="${mecanum}" />
-    <xacro:wheel.wheel wheel_radius="${wheel_radius}" side="rr" mecanum="${mecanum}" />
-
+    <xacro:wheel.wheel wheel_radius="${wheel_radius}" side="left" mecanum="${mecanum}" />
+    <xacro:wheel.wheel wheel_radius="${wheel_radius}" side="right" mecanum="${mecanum}" />
+    <xacro:unless value="${mecanum}">
+      <xacro:wheel.wheel wheel_radius="${wheel_radius}" side="castor" mecanum="${mecanum}" />
+    </xacro:unless>
+    
     <!-- HARDWARE PLUGINS -->
     <xacro:unless value="${use_sim}">
       <xacro:ros2_control.imu namespace="${namespace}" />
-      <xacro:ros2_control.rosbot_system namespace="${namespace}" />
+      <xacro:ros2_control.rosbot_system namespace="${namespace}" />  
     </xacro:unless>
 
     <!-- GAZEBO PLUGINS -->

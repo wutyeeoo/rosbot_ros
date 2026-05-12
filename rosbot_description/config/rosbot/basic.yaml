@@ -1,11 +1,48 @@
 ---
 components:
-  - type: LDR02
-    parent_link: cover_link
-    xyz: 0.02 0.0 0.0
+  # - type: LDR01
+  #   parent_link: body_link
+  #   # xyz: 0.06157  0.0 0.06593
+  #   xyz: 0.0  0.0 0.0
+  #   rpy: 0.0 0.0 0.0
+
+  - type: CAM07
+    parent_link: camera_mount_link
+    xyz: 0.0 0.0 0.0
     rpy: 0.0 0.0 0.0
 
-  - type: CAM11
-    parent_link: camera_mount_link
-    xyz: -0.01 0.0 0.02
-    rpy: 0.0 0.0 0.0
+  # - type: LDR20
+  #   parent_link: mount_link
+  #   xyz: 0.0 -0.1 0.0
+  #   rpy: 0.0 0.0 0.0
+  #   device_namespace: second_lidar
+
+  # - type: CAM01
+  #   name: camera
+  #   parent_link: mount_link
+  #   xyz: 0.1 0.0 0.0
+  #   rpy: 0.0 0.0 0.0
+  #   device_namespace: front_cam
+
+lasers:
+  - prefix: front
+    parent_link: body_link
+    x: 0.06148
+    y: 0.0
+    z: 0.07615
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+    # alpha: 270  # Degrees for the merger
+    alpha: 0.0  # Degrees for the merger
+
+  - prefix: rear
+    parent_link: body_link
+    x: -0.12188
+    y: 0.0
+    z: 0.07615
+    roll: 0.0
+    pitch: 0.0
+    yaw: 3.141 
+    # alpha: 90  # Degrees for the merger
+    alpha: 180.0  # Degrees for the merger

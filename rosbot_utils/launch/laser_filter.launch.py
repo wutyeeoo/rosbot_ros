@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Modifications Copyright (c) 2026 [Wut Yee Oo]
+
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import (
@@ -29,6 +32,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     config_dir = LaunchConfiguration("config_dir")
     robot_model = LaunchConfiguration("robot_model")
+    namespace = LaunchConfiguration("namespace")
 
     declare_config_dir_arg = DeclareLaunchArgument(
         "config_dir",
@@ -60,10 +64,15 @@ def generate_launch_description():
     )
 
     laser_filter_node = Node(
-        package="laser_filters",
-        executable="scan_to_scan_filter_chain",
-        name="laser_filter",
-        parameters=[laser_filter_config],
+    package="laser_filters",
+    executable="scan_to_scan_filter_chain",
+    name="laser_filter_front",
+    namespace=namespace,
+    parameters=[laser_filter_config],
+    remappings=[
+        ("scan", "scan_merged"),
+        ("scan_filtered", "scan_merged_filtered"),
+    ],
     )
 
     return LaunchDescription(

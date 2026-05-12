@@ -3,3 +3,15 @@
     ros_type_name: geometry_msgs/msg/TwistStamped
     gz_type_name: gz.msgs.Twist
     direction: GZ_TO_ROS
+
+  - topic_name: /<namespace>/_range_front
+    ros_type_name: sensor_msgs/msg/LaserScan
+    gz_type_name: gz.msgs.LaserScan
+    lazy: true
+    direction: GZ_TO_ROS
+
+  - topic_name: /<namespace>/_range_rear
+    ros_type_name: sensor_msgs/msg/LaserScan
+    gz_type_name: gz.msgs.LaserScan
+    lazy: true
+    direction: GZ_TO_ROS

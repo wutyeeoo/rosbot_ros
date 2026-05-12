@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Modifications Copyright (c) 2026 [Wut Yee Oo]
+
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -27,9 +29,9 @@ from launch.substitutions import (
     LaunchConfiguration,
     PathJoinSubstitution,
 )
-from launch_ros.actions import PushROSNamespace, SetRemap
+from launch_ros.actions import PushROSNamespace, SetRemap, Node
 from launch_ros.substitutions import FindPackageShare
-
+from nav2_common.launch import ReplaceString
 
 def generate_launch_description():
     microros = LaunchConfiguration("microros")
@@ -66,6 +68,10 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([rosbot_controller, "launch", "controller.launch.py"])
         ),
+        launch_arguments={
+            "robot_model": robot_model,
+            "namespace": namespace
+        }.items(),
     )
 
     microros_launch = IncludeLaunchDescription(
@@ -84,18 +90,21 @@ def generate_launch_description():
         ),
     )
 
-    laser_filter_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution([rosbot_utils, "launch", "laser_filter.launch.py"])
-        ),
-        launch_arguments={"robot_model": robot_model}.items(),
-    )
+    # laser_filter_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         PathJoinSubstitution([rosbot_utils, "launch", "laser_filter.launch.py"])
+    #     ),
+    #     launch_arguments={
+    #         "robot_model": robot_model,
+    #         "namespace": namespace
+    #     }.items(),
+    # )
 
-    joy_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution([rosbot_joy, "launch", "joy.launch.py"])
-        )
-    )
+    # joy_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         PathJoinSubstitution([rosbot_joy, "launch", "joy.launch.py"])
+    #     )
+    # )
 
     green_color = "\033[92m"
     reset_color = "\033[0m"
@@ -117,8 +126,7 @@ def generate_launch_description():
         controller_launch,
         microros_launch,
         localization_launch,
-        laser_filter_launch,
-        joy_launch,
+        # joy_launch,
         status_info,
     ]
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- body defining macro -->
-  <xacro:macro name="body" params="wheel_radius namespace">
+  <xacro:macro name="body" params="wheel_radius namespace xyz1 rpy1 prefix1 xyz2 rpy2 prefix2">
     <xacro:include filename="$(find rosbot_description)/urdf/rosbot/components/vl53lox.urdf.xacro" ns="range_sensor" />
 
     <link name="base_link" />
@@ -15,9 +15,12 @@
     <link name="body_link">
       <visual>
         <geometry>
-          <mesh filename="package://rosbot_description/meshes/rosbot/body.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="package://rosbot_description/meshes/rosbot/panda_body.stl" scale="0.001 0.001 0.001" />
         </geometry>
-        <origin xyz="0.0 0.0 -0.0173" rpy="${pi/2} 0.0 ${pi/2}" />
+        <!-- <geometry>
+          <box size="0.221 0.103 0.09" />
+        </geometry> -->
+        <origin xyz="-0.02761 0.0 0.0114" rpy="3.141 0.0 0.0" />
         <material name="Black">
           <color rgba="0.1 0.1 0.1 1.0" />
         </material>
@@ -28,43 +31,22 @@
 
       <collision>
         <geometry>
-          <box size="0.197 0.150 0.080" />
+          <box size="0.221 0.103 0.09036" />
         </geometry>
-        <origin xyz="0.0 0.0 ${0.040 - 0.02}" rpy="0.0 0.0 0.0" />
+        <origin xyz="-0.02434 0 0.02922" rpy="0.0 0.0 0.0" />
       </collision>
 
       <inertial>
-        <mass value="1.728" />
-        <inertia ixx="0.004162" ixy="0.0"     ixz="0.0"
-                                iyy="0.00651" iyz="0.0"
-                                              izz="0.008828" />
-        <origin xyz="0.0 0.0 ${0.040 - 0.02}" rpy="0.0 0.0 0.0" />
+        <mass value="0.916" />
+        <inertia ixx="0.001019" ixy="0.000062"     ixz="-0.000127"
+                                iyy="0.003027"        iyz="-0.000029"
+                                              izz="0.003307" />
+        <origin xyz="-0.02706 0.00089 0.03205" rpy="0.0 0.0 0.0" />
       </inertial>
     </link>
 
-    <joint name="body_to_cover_joint" type="fixed">
-      <origin xyz="0.0 0.0 0.0603" rpy="0.0 0.0 0.0" />
-      <parent link="body_link" />
-      <child link="cover_link" />
-    </joint>
-
-    <link name="cover_link">
-      <visual>
-        <geometry>
-          <mesh filename="package://rosbot_description/meshes/rosbot/cover.stl" scale="0.001 0.001 0.001" />
-        </geometry>
-        <origin xyz="0.0 0.0 -0.002" rpy="${pi/2} 0.0 ${pi/2}" />
-        <material name="Black">
-          <color rgba="0.1 0.1 0.1 1.0" />
-        </material>
-        <gazebo reference="cover_link">
-          <material>Gazebo/Black</material>
-        </gazebo>
-      </visual>
-    </link>
-
     <joint name="body_to_imu_joint" type="fixed">
-      <origin xyz="0.003 -0.0495 0.04332" rpy="0.0 0.0 0.0" />
+      <origin xyz="0.02258 0.02495 0.07329" rpy="0.0 0.0 0.0" />
       <parent link="body_link" />
       <child link="imu_link" />
     </joint>
@@ -72,17 +54,15 @@
     <link name="imu_link" />
 
     <joint name="body_to_camera_joint" type="fixed">
-      <origin xyz="-0.0141 0.0 0.125" rpy="0.0 0.0 0.0" />
+      <origin xyz="0.06087 0.0 0.10240" rpy="0.0 0.0 0.0" />
       <parent link="body_link" />
       <child link="camera_mount_link" />
     </joint>
 
     <link name="camera_mount_link" />
 
-    <xacro:range_sensor.vl53lox parent="body_link" xyz="0.0926  0.05 0.015"   rpy="0.0 0.0 ${radians(12.5)}"  prefix="fl" namespace="${namespace}" />
-    <xacro:range_sensor.vl53lox parent="body_link" xyz="0.0926 -0.05 0.015"   rpy="0.0 0.0 ${radians(-12.5)}" prefix="fr" namespace="${namespace}" />
-    <xacro:range_sensor.vl53lox parent="body_link" xyz="-0.0926 0.05 0.0115"  rpy="0.0 0.0 ${radians(167.5)}" prefix="rl" namespace="${namespace}" />
-    <xacro:range_sensor.vl53lox parent="body_link" xyz="-0.0926 -0.05 0.0115" rpy="0.0 0.0 ${radians(192.5)}" prefix="rr" namespace="${namespace}" />
+    <xacro:range_sensor.vl53lox parent="body_link" xyz="${xyz1}"   rpy="${rpy1}"  prefix="${prefix1}" namespace="${namespace}" />
+    <xacro:range_sensor.vl53lox parent="body_link" xyz="${xyz2}"   rpy="${rpy2}"  prefix="${prefix2}" namespace="${namespace}" />
 
   </xacro:macro>
 </robot>

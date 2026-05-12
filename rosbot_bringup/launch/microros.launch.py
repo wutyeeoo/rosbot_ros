@@ -115,13 +115,13 @@ def generate_launch_description():
 
     declare_serial_baudrate_arg = DeclareLaunchArgument(
         "serial_baudrate",
-        default_value="576000",
+        default_value="115200",
         description="ROSbot only. Baud rate for serial communication",
     )
 
     declare_serial_port_arg = DeclareLaunchArgument(
         "serial_port",
-        default_value="/dev/ttySERIAL",
+        default_value="/dev/ttyUSB0",
         description="ROSbot only. Serial port for micro-ROS agent",
     )
 

@@ -1,8 +1,8 @@
 repositories:
   husarion_components_description:
     type: git
-    url: https://github.com/husarion/husarion_components_description.git
-    version: a28a41ba059e689420a3e9d8552435781ebe286b
+    url: https://github.com/wutyeeoo/husarion_components_description
+    version: b4f2330a831d46c055e4b7c9e2cba99bf6b5c249
   husarion_controllers:
     type: git
     url: https://github.com/husarion/husarion_controllers
@@ -11,3 +11,7 @@ repositories:
     type: git
     url: https://github.com/micro-ROS/micro-ROS-Agent
     version: af007872b034d1ed31de4815377031350ab0034b
+  ros2_laser_scan_merger:
+    type: git
+    url: https://github.com/wutyeeoo/ros2_laser_scan_merger
+    version: 25c6f9893660d12ac10c3d9897145b96e8352b61
