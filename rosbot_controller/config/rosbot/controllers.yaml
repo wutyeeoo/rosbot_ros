@@ -2,7 +2,7 @@
 /**:
   controller_manager:
     ros__parameters:
-      update_rate: 100 # Hz
+      update_rate: 50 # Hz
 
       differential_drive_controller:
         type: diff_drive_controller/DiffDriveController
@@ -29,7 +29,7 @@
       left_wheel_names: [left_wheel_joint]
       right_wheel_names: [right_wheel_joint]
       wheel_separation: 0.186
-      wheel_radius: 0.0425
+      wheel_radius: 0.0344
       wheel_separation_multiplier: 1.36 # ICR coefficient isn't totally accurate and this coefficient can differ for various ground types
       left_wheel_radius_multiplier: 0.95  # Based on real measurements
       right_wheel_radius_multiplier: 0.95 # Based on real measurements
@@ -39,7 +39,7 @@
       twist_covariance_diagonal: [3.3e-5, 3.3e-5, 0.0, 0.0, 0.0, 2.8e-3] # Values measured experimentally
 
       # Odometry
-      publish_rate: 20.0
+      publish_rate: 10.0
       open_loop: false
       position_feedback: false
       velocity_rolling_window_size: 1
@@ -53,23 +53,23 @@
       # Limits
       linear:
         x:
-          max_velocity: 1.0 # m/s
-          min_velocity: -1.0 # m/s
-          max_acceleration: 1.0 # m/s^2
-          max_deceleration: -1.0 # m/s^2
-          max_acceleration_reverse: -1.0 # m/s^2
-          max_deceleration_reverse: 1.0 # m/s^2
+          max_velocity: 0.8 # m/s
+          min_velocity: -0.8 # m/s
+          max_acceleration: 0.05 # m/s^2
+          max_deceleration: -0.05 # m/s^2
+          max_acceleration_reverse: -0.05 # m/s^2
+          max_deceleration_reverse: 0.05 # m/s^2
           max_jerk: .nan # m/s^3
           min_jerk: .nan # m/s^3
 
       angular:
         z:
-          max_velocity: 3.14 # rad/s
-          min_velocity: -3.14 # rad/s
-          max_acceleration: 4.0 # rad/s^2
-          max_deceleration: -4.0 # rad/s^2
-          max_acceleration_reverse: -4.0 # rad/s^2
-          max_deceleration_reverse: 4.0 # rad/s^2
+          max_velocity: 23.0 # rad/s
+          min_velocity: -23.0 # rad/s
+          max_acceleration: 1.45 # rad/s^2
+          max_deceleration: -1.45 # rad/s^2
+          max_acceleration_reverse: -1.45 # rad/s^2
+          max_deceleration_reverse: 1.45 # rad/s^2
           max_jerk: .nan # rad/s^3
           min_jerk: .nan # rad/s^3
 

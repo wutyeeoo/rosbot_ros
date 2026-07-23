@@ -33,10 +33,23 @@ bool EStop::ReadEStopState()
     // Roboteq or Safety Board), disabling the software Watchdog is necessary to prevent an
     // uncontrolled reset.
     if (e_stop_triggered_) {
+      last_e_stop_ = true;
       gpio_controller_->EStopTrigger();
     }
+    else{
+      if (last_e_stop_ && !e_stop_triggered_) {
+        last_e_stop_ = false;
+        std::thread([this]() {
+          std::fprintf(stdout, "[EStop] Physical button reset transition detected. Resetting...\n");
+          try {
+            this->ResetEStop(); 
+          } catch (const std::exception &e) {
+            throw std::runtime_error("Resetting estop failed: " + std::string(e.what()));
+          }
+        }).detach();
+      }
+    }
   }
-
   return e_stop_triggered_;
 }
 

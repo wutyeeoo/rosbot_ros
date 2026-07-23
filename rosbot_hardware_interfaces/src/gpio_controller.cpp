@@ -119,6 +119,8 @@ void GPIOController::Start()
   // MotorPowerEnable(true);
 
   watchdog_ = std::make_unique<Watchdog>(gpio_driver_);
+
+  watchdog_->TurnOn();
 }
 
 void GPIOController::EStopTrigger()
@@ -162,72 +164,23 @@ void GPIOController::EStopReset()
   }
 }
 
-// bool GPIOController::MotorPowerEnable(const bool enable)
-// {
-//   return gpio_driver_->SetPinValue(GPIOPin::DRIVER_EN, enable);
-// };
-
-// bool GPIOController::AUXPowerEnable(const bool enable)
-// {
-//   return gpio_driver_->SetPinValue(GPIOPin::AUX_PW_EN, enable);
-// };
-
-// bool GPIOController::FanEnable(const bool enable)
-// {
-//   return gpio_driver_->SetPinValue(GPIOPin::FAN_SW, enable);
-// };
-
-// bool GPIOController::DigitalPowerEnable(const bool enable)
-// {
-//   return gpio_driver_->SetPinValue(GPIOPin::VDIG_OFF, !enable);
-// };
-
-// bool GPIOController::ChargerEnable(const bool enable)
-// {
-//   return gpio_driver_->SetPinValue(GPIOPin::CHRG_DISABLE, !enable);
-// }
-
-// bool GPIOController::LEDControlEnable(const bool enable)
-// {
-//   // pin_validation_wait_time=10ms used due to slow pin state transition
-//   // on pin loaded by high 100nF capacity in SBC Overlay v1.4
-//   return gpio_driver_->SetPinValue(GPIOPin::LED_SBC_SEL, enable, std::chrono::milliseconds(10));
-// }
-
-// std::unordered_map<GPIOPin, bool> GPIOController::QueryControlInterfaceIOStates() const
-// {
-//   std::unordered_map<GPIOPin, bool> io_state;
-
-//   std::vector<GPIOPin> pins_to_query = {
-//     GPIOPin::AUX_PW_EN, GPIOPin::CHRG_SENSE, GPIOPin::CHRG_DISABLE, GPIOPin::VDIG_OFF,
-//     GPIOPin::FAN_SW,    GPIOPin::SHDN_INIT,  GPIOPin::VMOT_ON,
-//   };
-
-//   std::for_each(pins_to_query.begin(), pins_to_query.end(), [&](GPIOPin pin) {
-//     bool is_active = gpio_driver_->IsPinActive(pin);
-//     io_state.emplace(pin, is_active);
-//   });
-
-//   return io_state;
-// }
-
 const std::vector<GPIOInfo> GPIOController::gpio_config_info_storage_ = {
-  GPIOInfo{GPIOPin::WATCHDOG, gpiod::line::direction::OUTPUT},
-  // GPIOInfo{GPIOPin::AUX_PW_EN, gpiod::line::direction::OUTPUT},
-  // GPIOInfo{
-  //   GPIOPin::CHRG_DISABLE, gpiod::line::direction::OUTPUT, false, gpiod::line::value::ACTIVE},
-  // GPIOInfo{GPIOPin::DRIVER_EN, gpiod::line::direction::OUTPUT},
-  GPIOInfo{GPIOPin::E_STOP_RESET, gpiod::line::direction::INPUT},
-  // GPIOInfo{GPIOPin::FAN_SW, gpiod::line::direction::OUTPUT},
-  // GPIOInfo{GPIOPin::GPOUT1, gpiod::line::direction::OUTPUT},
-  // GPIOInfo{GPIOPin::GPOUT2, gpiod::line::direction::OUTPUT},
-  // GPIOInfo{GPIOPin::GPIN1, gpiod::line::direction::INPUT},
-  // GPIOInfo{GPIOPin::GPIN2, gpiod::line::direction::INPUT},
-  // GPIOInfo{GPIOPin::SHDN_INIT, gpiod::line::direction::INPUT},
-  // GPIOInfo{GPIOPin::VDIG_OFF, gpiod::line::direction::OUTPUT},
-  // GPIOInfo{GPIOPin::VMOT_ON, gpiod::line::direction::OUTPUT},
-  // GPIOInfo{GPIOPin::CHRG_SENSE, gpiod::line::direction::INPUT, true},
-  // GPIOInfo{GPIOPin::LED_SBC_SEL, gpiod::line::direction::OUTPUT, true},
+    GPIOInfo{
+        .pin = GPIOPin::WATCHDOG,
+        .direction = gpiod::line::direction::OUTPUT,
+        .active_low = false,
+        .init_value = gpiod::line::value::INACTIVE,
+        .value = gpiod::line::value::INACTIVE,
+        .offset = 6  // GPIO 6
+    },
+    GPIOInfo{
+        .pin = GPIOPin::E_STOP_RESET,
+        .direction = gpiod::line::direction::INPUT,
+        .active_low = false,
+        .init_value = gpiod::line::value::INACTIVE,
+        .value = gpiod::line::value::INACTIVE,
+        .offset = 5  // GPIO 5
+    },
 };
 
 const std::vector<GPIOInfo> & GPIOController::GetGPIOConfigInfoStorage()

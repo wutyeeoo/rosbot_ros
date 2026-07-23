@@ -19,7 +19,7 @@ services:
       dockerfile: docker/Dockerfile.hardware
     <<: *common-config
     devices:
-      - /dev/ttySERIAL # ROSbot driver communication port
+      - /dev/ttyUSB0 # ROSbot driver communication port
       # - /dev/input:/dev/input:ro # Joystick
     environment:
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp

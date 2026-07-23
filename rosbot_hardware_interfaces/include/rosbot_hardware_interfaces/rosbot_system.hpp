@@ -83,7 +83,6 @@ public:
     const rclcpp::QoS & qos = rclcpp::ServicesQoS());
 
 private:
-
   void CallbackWrapper(SrvRequestConstPtr request, SrvResponsePtr response);
   void ProccessCallback(SrvRequestConstPtr request);
 

@@ -14,4 +14,4 @@ repositories:
   ros2_laser_scan_merger:
     type: git
     url: https://github.com/wutyeeoo/ros2_laser_scan_merger
-    version: 25c6f9893660d12ac10c3d9897145b96e8352b61
+    version: a5bba27704b90730be71f0dc88c8eb8ae7f4aec8

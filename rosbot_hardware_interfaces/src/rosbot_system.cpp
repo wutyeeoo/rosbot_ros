@@ -34,15 +34,15 @@ namespace rosbot_hardware_interfaces {
 template class ROSServiceWrapper<std_srvs::srv::SetBool, std::function<void(bool)>>;
 template class ROSServiceWrapper<std_srvs::srv::Trigger, std::function<void()>>;
 
-// template <typename SrvT, typename CallbackT>
-// void ROSServiceWrapper<SrvT, CallbackT>::RegisterService(
-//   const rclcpp::Node::SharedPtr node, const std::string & service_name,
-//   rclcpp::CallbackGroup::SharedPtr group, const rclcpp::QoS & qos)
-// {
-//   service_ = node->create_service<SrvT>(
-//     service_name, std::bind(&ROSServiceWrapper<SrvT, CallbackT>::CallbackWrapper, this, _1, _2),
-//     qos, group);
-// }
+template <typename SrvT, typename CallbackT>
+void ROSServiceWrapper<SrvT, CallbackT>::RegisterService(
+  const rclcpp::Node::SharedPtr node, const std::string & service_name,
+  rclcpp::CallbackGroup::SharedPtr group, const rclcpp::QoS & qos)
+{
+  service_ = node->create_service<SrvT>(
+    service_name, std::bind(&ROSServiceWrapper<SrvT, CallbackT>::CallbackWrapper, this, std::placeholders::_1, std::placeholders::_2),
+    qos, group);
+}
 
 template <typename SrvT, typename CallbackT>
 void ROSServiceWrapper<SrvT, CallbackT>::CallbackWrapper(
@@ -403,10 +403,6 @@ void RosbotSystem::ConfigureGPIOController()
 
 void RosbotSystem::ConfigureEStop()
 {
-  // if (!gpio_controller_ || !roboteq_error_filter_ || !robot_driver_ || !robot_driver_write_mtx_) {
-  //   throw std::runtime_error("Failed to configure E-Stop, make sure to setup entities first.");
-  // }
-
   if (!gpio_controller_) {
     throw std::runtime_error("Failed to configure E-Stop, make sure to setup entities first.");
   }
@@ -432,9 +428,6 @@ void RosbotSystem::ResetEStop()
 
 void RosbotSystem::UpdateEStopState()
 {
-  // if (robot_driver_->CommunicationError()) {
-  //   e_stop_->TriggerEStop();
-  // }
 
   const bool e_stop = e_stop_->ReadEStopState();
   PublishEStopStateIfChanged(e_stop);

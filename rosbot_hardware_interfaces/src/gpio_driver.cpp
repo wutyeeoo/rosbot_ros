@@ -92,17 +92,18 @@ void GPIODriver::ConfigureLineRequest(
 {
   gpiod::line_settings settings = GenerateLineSettings(gpio_info);
 
-  std::string pin_name;
-  try {
-    pin_name = pin_names_.at(gpio_info.pin);
-  } catch (const std::out_of_range & e) {
-    throw std::runtime_error("No name defined for one of pins: " + std::string(e.what()));
-  }
+  // std::string pin_name;
+  // try {
+  //   pin_name = pin_names_.at(gpio_info.pin);
+  // } catch (const std::out_of_range & e) {
+  //   throw std::runtime_error("No name defined for one of pins: " + std::string(e.what()));
+  // }
 
-  gpiod::line::offset offset = chip.get_line_offset_from_name(pin_name);
+  // gpiod::line::offset offset = chip.get_line_offset_from_name(pin_name);
 
-  builder.add_line_settings(offset, settings);
-  gpio_info.offset = offset;
+  // builder.add_line_settings(offset, settings);
+  builder.add_line_settings(gpio_info.offset, settings);
+  // gpio_info.offset = offset;
 }
 
 gpiod::line_settings GPIODriver::GenerateLineSettings(const GPIOInfo & gpio_info)
@@ -114,7 +115,9 @@ gpiod::line_settings GPIODriver::GenerateLineSettings(const GPIOInfo & gpio_info
   // Set the initial value only when the line is configured for the first time;
   // otherwise, set the last known value
   gpiod::line::value new_output_value = line_request_ ? gpio_info.value : gpio_info.init_value;
-  settings.set_output_value(new_output_value);
+  if (gpio_info.direction == gpiod::line::direction::OUTPUT) {
+    settings.set_output_value(new_output_value);
+  } 
 
   if (gpio_info.direction == gpiod::line::direction::INPUT) {
     settings.set_edge_detection(gpiod::line::edge::BOTH);
@@ -221,7 +224,8 @@ void GPIODriver::GPIOMonitorOn()
   gpio_monitor_thread_ = std::make_unique<std::thread>(&GPIODriver::MonitorAsyncEvents, this);
 
   if (
-    monitor_init_cond_var_.wait_for(lck, std::chrono::milliseconds(100)) ==
+    // monitor_init_cond_var_.wait_for(lck, std::chrono::milliseconds(100)) ==
+    monitor_init_cond_var_.wait_for(lck, std::chrono::milliseconds(1000)) ==
     std::cv_status::timeout) {
     throw std::runtime_error("Timeout while waiting for GPIO monitor thread.");
   }
@@ -230,7 +234,12 @@ void GPIODriver::GPIOMonitorOn()
 void GPIODriver::MonitorAsyncEvents()
 {
   if (use_rt_) {
-    rosbot_utils::ConfigureRT(gpio_monit_thread_sched_priority_);
+    try {
+      rosbot_utils::ConfigureRT(gpio_monit_thread_sched_priority_);
+    } catch (const std::exception & e) {
+      std::cerr << "Failed to configure RT scheduling for GPIO monitor thread: " << e.what()
+                << std::endl;
+    }
   }
 
   auto edge_event_buffer = gpiod::edge_event_buffer(edge_event_buffer_size_);
